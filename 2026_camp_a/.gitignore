@@ -1,0 +1,31 @@
+# Vivado generated
+.Xil/
+*.jou
+*.log
+*.pb
+*.wdb
+*.wcfg
+*.str
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.runs/
+*.gen/
+
+# Build artifacts
+*.bit
+*.bin
+*.dcp
+*.ltx
+*.xsa
+*.rpt
+
+# Simulation runtime
+xsim.dir/
+
+# Vitis workspace generated
+PS/vitis_*_ws_*/
+PS/**/Debug/
+PS/**/Release/
+PS/**/.metadata/

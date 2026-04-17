@@ -50,7 +50,7 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 ps7
 
 set_property -dict [list \
     CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {50} \
-    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {65} \
+    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {64} \
     CONFIG.PCW_EN_CLK0_PORT {1} \
     CONFIG.PCW_EN_CLK1_PORT {1} \
     CONFIG.PCW_EN_RST0_PORT {1} \
@@ -78,7 +78,7 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 \
 
 # 时钟命名:
 #   FCLK_CLK0 = 50MHz  (AXI 总线、DMA、GPIO)
-#   FCLK_CLK1 = 65MHz  (ADC 采样时钟)
+#   FCLK_CLK1 = 64MHz  (ADC 采样时钟)
 
 # =====================================================================
 # 2. Processor System Reset (50MHz 域)
@@ -170,16 +170,16 @@ connect_bd_net [get_bd_pins axi_dma_0/s2mm_introut] [get_bd_pins ps7/IRQ_F2P]
 connect_bd_net [get_bd_pins ps7/FCLK_CLK0] [get_bd_pins ps7/S_AXI_HP0_ACLK]
 
 # =====================================================================
-# 6. CIC 级联抽取 + 65MHz 域独立复位
+# 6. CIC 级联抽取 + 64MHz 域独立复位
 # 策略: ADC 输出 32-bit {ch2_s16, ch1_s16}
 #       先用 xlslice 各取 16-bit，分别经独立 CIC 链抽取，
 #       再在 50MHz 域合并回 32-bit 后送 DMA
 # =====================================================================
 
-# 65MHz 域独立复位
-create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_65M
-connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins rst_ps7_65M/slowest_sync_clk]
-connect_bd_net [get_bd_pins ps7/FCLK_RESET0_N] [get_bd_pins rst_ps7_65M/ext_reset_in]
+# 64MHz 域独立复位
+create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_64M
+connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins rst_ps7_64M/slowest_sync_clk]
+connect_bd_net [get_bd_pins ps7/FCLK_RESET0_N] [get_bd_pins rst_ps7_64M/ext_reset_in]
 
 # 125MHz 域独立复位（DAC 域）
 create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_125M
@@ -188,24 +188,18 @@ connect_bd_net [get_bd_pins ps7/FCLK_RESET0_N] [get_bd_pins rst_ps7_125M/ext_res
 connect_bd_net [get_bd_pins clk_wiz_0/locked] [get_bd_pins rst_ps7_125M/dcm_locked]
 
 # ---- CH1: 取 adc_tdata 低 16-bit ----
-create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 slice_ch1
-set_property -dict [list CONFIG.DIN_WIDTH {32} CONFIG.DIN_FROM {15} CONFIG.DIN_TO {0}] \
-    [get_bd_cells slice_ch1]
 
 # ---- CH2: 取 adc_tdata 高 16-bit ----
-create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 slice_ch2
-set_property -dict [list CONFIG.DIN_WIDTH {32} CONFIG.DIN_FROM {31} CONFIG.DIN_TO {16}] \
-    [get_bd_cells slice_ch2]
 
-# CIC_0_CH1: CH1 65MHz→13MHz (5×)
+# CIC_0_CH1: CH1 64MHz→12.8MHz (5×)
 create_bd_cell -type ip -vlnv xilinx.com:ip:cic_compiler:4.0 cic_0_ch1
 set_property -dict [list \
     CONFIG.Filter_Type {Decimation} \
     CONFIG.Number_Of_Stages {4} \
     CONFIG.Sample_Rate_Changes {Fixed} \
     CONFIG.Fixed_Or_Initial_Rate {5} \
-    CONFIG.Input_Sample_Frequency {65} \
-    CONFIG.Clock_Frequency {65} \
+    CONFIG.Input_Sample_Frequency {64} \
+    CONFIG.Clock_Frequency {64} \
     CONFIG.Input_Data_Width {16} \
     CONFIG.Quantization {Truncation} \
     CONFIG.Output_Data_Width {16} \
@@ -214,15 +208,15 @@ set_property -dict [list \
     CONFIG.HAS_ARESETN {true} \
 ] [get_bd_cells cic_0_ch1]
 
-# CIC_1_CH1: CH1 13MHz→2.6MHz (5×)
+# CIC_1_CH1: CH1 12.8MHz→2.56MHz (5×)
 create_bd_cell -type ip -vlnv xilinx.com:ip:cic_compiler:4.0 cic_1_ch1
 set_property -dict [list \
     CONFIG.Filter_Type {Decimation} \
     CONFIG.Number_Of_Stages {4} \
     CONFIG.Sample_Rate_Changes {Fixed} \
     CONFIG.Fixed_Or_Initial_Rate {5} \
-    CONFIG.Input_Sample_Frequency {13} \
-    CONFIG.Clock_Frequency {65} \
+    CONFIG.Input_Sample_Frequency {12.8} \
+    CONFIG.Clock_Frequency {64} \
     CONFIG.Input_Data_Width {16} \
     CONFIG.Quantization {Truncation} \
     CONFIG.Output_Data_Width {16} \
@@ -238,8 +232,8 @@ set_property -dict [list \
     CONFIG.Number_Of_Stages {4} \
     CONFIG.Sample_Rate_Changes {Fixed} \
     CONFIG.Fixed_Or_Initial_Rate {5} \
-    CONFIG.Input_Sample_Frequency {65} \
-    CONFIG.Clock_Frequency {65} \
+    CONFIG.Input_Sample_Frequency {64} \
+    CONFIG.Clock_Frequency {64} \
     CONFIG.Input_Data_Width {16} \
     CONFIG.Quantization {Truncation} \
     CONFIG.Output_Data_Width {16} \
@@ -254,8 +248,8 @@ set_property -dict [list \
     CONFIG.Number_Of_Stages {4} \
     CONFIG.Sample_Rate_Changes {Fixed} \
     CONFIG.Fixed_Or_Initial_Rate {5} \
-    CONFIG.Input_Sample_Frequency {13} \
-    CONFIG.Clock_Frequency {65} \
+    CONFIG.Input_Sample_Frequency {12.8} \
+    CONFIG.Clock_Frequency {64} \
     CONFIG.Input_Data_Width {16} \
     CONFIG.Quantization {Truncation} \
     CONFIG.Output_Data_Width {16} \
@@ -267,7 +261,7 @@ set_property -dict [list \
 # 时钟和复位连接
 foreach cic_cell {cic_0_ch1 cic_1_ch1 cic_0_ch2 cic_1_ch2} {
     connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins $cic_cell/aclk]
-    connect_bd_net [get_bd_pins rst_ps7_65M/peripheral_aresetn] [get_bd_pins $cic_cell/aresetn]
+    connect_bd_net [get_bd_pins rst_ps7_64M/peripheral_aresetn] [get_bd_pins $cic_cell/aresetn]
 }
 
 # CIC 级联
@@ -278,10 +272,10 @@ connect_bd_intf_net [get_bd_intf_pins cic_0_ch2/M_AXIS_DATA] [get_bd_intf_pins c
 # 7. 时钟域转换 + AXIS Concat + TLAST 生成器
 # =====================================================================
 
-# Clock Converter CH1: 65MHz → 50MHz
+# Clock Converter CH1: 64MHz → 50MHz
 create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter:1.1 clkconv_ch1
 connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins clkconv_ch1/s_axis_aclk]
-connect_bd_net [get_bd_pins rst_ps7_65M/peripheral_aresetn] [get_bd_pins clkconv_ch1/s_axis_aresetn]
+connect_bd_net [get_bd_pins rst_ps7_64M/peripheral_aresetn] [get_bd_pins clkconv_ch1/s_axis_aresetn]
 connect_bd_net [get_bd_pins ps7/FCLK_CLK0] [get_bd_pins clkconv_ch1/m_axis_aclk]
 connect_bd_net [get_bd_pins rst_ps7_50M/peripheral_aresetn] [get_bd_pins clkconv_ch1/m_axis_aresetn]
 connect_bd_intf_net [get_bd_intf_pins cic_1_ch1/M_AXIS_DATA] [get_bd_intf_pins clkconv_ch1/S_AXIS]
@@ -289,7 +283,7 @@ connect_bd_intf_net [get_bd_intf_pins cic_1_ch1/M_AXIS_DATA] [get_bd_intf_pins c
 # Clock Converter CH2
 create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter:1.1 clkconv_ch2
 connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins clkconv_ch2/s_axis_aclk]
-connect_bd_net [get_bd_pins rst_ps7_65M/peripheral_aresetn] [get_bd_pins clkconv_ch2/s_axis_aresetn]
+connect_bd_net [get_bd_pins rst_ps7_64M/peripheral_aresetn] [get_bd_pins clkconv_ch2/s_axis_aresetn]
 connect_bd_net [get_bd_pins ps7/FCLK_CLK0] [get_bd_pins clkconv_ch2/m_axis_aclk]
 connect_bd_net [get_bd_pins rst_ps7_50M/peripheral_aresetn] [get_bd_pins clkconv_ch2/m_axis_aresetn]
 connect_bd_intf_net [get_bd_intf_pins cic_1_ch2/M_AXIS_DATA] [get_bd_intf_pins clkconv_ch2/S_AXIS]
@@ -302,8 +296,9 @@ connect_bd_net [get_bd_pins rst_ps7_50M/peripheral_aresetn] [get_bd_pins axis_co
 connect_bd_intf_net [get_bd_intf_pins clkconv_ch1/M_AXIS] [get_bd_intf_pins axis_combiner_0/S00_AXIS]
 connect_bd_intf_net [get_bd_intf_pins clkconv_ch2/M_AXIS] [get_bd_intf_pins axis_combiner_0/S01_AXIS]
 
-# axis_tlast_gen RTL 模块: 每 16384 拍打一次 TLAST
+# axis_tlast_gen RTL 模块: 每 1024 拍打一次 TLAST，与 ADC DMA smoke test 的 CAPTURE_WORDS 匹配
 create_bd_cell -type module -reference axis_tlast_gen tlast_gen_0
+set_property -dict [list CONFIG.DATA_WIDTH {32} CONFIG.PKT_LEN {1024}] [get_bd_cells tlast_gen_0]
 connect_bd_net [get_bd_pins ps7/FCLK_CLK0] [get_bd_pins tlast_gen_0/aclk]
 connect_bd_net [get_bd_pins rst_ps7_50M/peripheral_aresetn] [get_bd_pins tlast_gen_0/aresetn]
 connect_bd_intf_net [get_bd_intf_pins axis_combiner_0/M_AXIS] [get_bd_intf_pins tlast_gen_0/S_AXIS]
@@ -321,6 +316,12 @@ foreach {gpio_name} {gpio_a_dds_freq gpio_a_dds_phase gpio_b_dds_freq gpio_b_dds
 }
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 gpio_phase_read
 set_property -dict [list CONFIG.C_GPIO_WIDTH {32} CONFIG.C_ALL_INPUTS {1}] [get_bd_cells gpio_phase_read]
+
+# Keep the phase-read AXI GPIO internal. Replace this constant with real
+# phase-measurement logic when that feedback path is ready.
+create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_phase_read
+set_property -dict [list CONFIG.CONST_WIDTH {32} CONFIG.CONST_VAL {0}] [get_bd_cells const_phase_read]
+connect_bd_net [get_bd_pins const_phase_read/dout] [get_bd_pins gpio_phase_read/gpio_io_i]
 
 # GPIO → Interconnect M01~M08
 set gpio_list [list gpio_a_dds_freq gpio_a_dds_phase gpio_b_dds_freq gpio_b_dds_phase \
@@ -341,7 +342,12 @@ foreach gpio $gpio_list {
 create_bd_cell -type module -reference an9238_axis adc_inst
 
 connect_bd_net [get_bd_pins ps7/FCLK_CLK1] [get_bd_pins adc_inst/adc_clk]
-connect_bd_net [get_bd_pins rst_ps7_65M/peripheral_aresetn] [get_bd_pins adc_inst/rst_n]
+connect_bd_net [get_bd_pins rst_ps7_64M/peripheral_aresetn] [get_bd_pins adc_inst/rst_n]
+
+create_bd_port -dir I -from 11 -to 0 ad1_in
+create_bd_port -dir I -from 11 -to 0 ad2_in
+create_bd_port -dir O ad1_clk
+create_bd_port -dir O ad2_clk
 
 # ADC 外部时钟端口
 connect_bd_net [get_bd_pins adc_inst/ad1_clk] [get_bd_ports ad1_clk]
@@ -350,11 +356,11 @@ connect_bd_net [get_bd_pins adc_inst/ad1_in]  [get_bd_ports ad1_in]
 connect_bd_net [get_bd_pins adc_inst/ad2_in]  [get_bd_ports ad2_in]
 
 # CH1 → CIC_0_CH1 (用 connect_bd_intf_net 连整个 bundle)
-connect_bd_intf_net [get_bd_intf_pins adc_inst/m_ch1] \
+connect_bd_intf_net [get_bd_intf_pins adc_inst/M_AXIS_CH1] \
                     [get_bd_intf_pins cic_0_ch1/S_AXIS_DATA]
 
 # CH2 → CIC_0_CH2
-connect_bd_intf_net [get_bd_intf_pins adc_inst/m_ch2] \
+connect_bd_intf_net [get_bd_intf_pins adc_inst/M_AXIS_CH2] \
                     [get_bd_intf_pins cic_0_ch2/S_AXIS_DATA]
 
 # ---- dac_out: DAC 输出（RTL module） ----
@@ -362,6 +368,8 @@ create_bd_cell -type module -reference dac_out dac_inst
 
 connect_bd_net [get_bd_pins clk_wiz_0/clk_out1] [get_bd_pins dac_inst/dac_clk]
 connect_bd_net [get_bd_pins rst_ps7_125M/peripheral_aresetn] [get_bd_pins dac_inst/rst_n]
+connect_bd_net [get_bd_pins ps7/FCLK_CLK0] [get_bd_pins dac_inst/cfg_clk]
+connect_bd_net [get_bd_pins rst_ps7_50M/peripheral_aresetn] [get_bd_pins dac_inst/cfg_rst_n]
 
 connect_bd_net [get_bd_pins gpio_a_dds_freq/gpio_io_o]  [get_bd_pins dac_inst/dds_a_freq]
 connect_bd_net [get_bd_pins gpio_a_dds_phase/gpio_io_o] [get_bd_pins dac_inst/dds_a_phase]
@@ -382,17 +390,6 @@ connect_bd_net [get_bd_pins wave_sel_b_slice/Dout] [get_bd_pins dac_inst/wave_se
 # =====================================================================
 # 10. 外部端口并连线
 # =====================================================================
-
-# AN9238 ADC 端口
-create_bd_port -dir I -from 11 -to 0 ad1_in
-create_bd_port -dir I -from 11 -to 0 ad2_in
-create_bd_port -dir O ad1_clk
-create_bd_port -dir O ad2_clk
-
-connect_bd_net [get_bd_ports ad1_in] [get_bd_pins adc_inst/ad1_in]
-connect_bd_net [get_bd_ports ad2_in] [get_bd_pins adc_inst/ad2_in]
-connect_bd_net [get_bd_pins adc_inst/ad1_clk] [get_bd_ports ad1_clk]
-connect_bd_net [get_bd_pins adc_inst/ad2_clk] [get_bd_ports ad2_clk]
 
 # AN9767 DAC 端口
 create_bd_port -dir O -from 13 -to 0 da1_data
@@ -431,7 +428,27 @@ save_bd_design
 
 # 生成 Wrapper
 make_wrapper -files [get_files system.bd] -top
-add_files -norecurse [get_files -of_objects [get_filesets sources_1] -filter {NAME =~ "*system_wrapper.v"}]
+
+# 用绝对路径添加 wrapper（避免 glob 匹配失败）
+set wrapper_path [file normalize \
+    "$project_dir/$project_name/${project_name}.gen/sources_1/bd/system/hdl/system_wrapper.v"]
+if {[file exists $wrapper_path]} {
+    add_files -norecurse $wrapper_path
+    set_property top system_wrapper [current_fileset]
+    update_compile_order -fileset sources_1
+    puts "INFO: Wrapper added: $wrapper_path"
+} else {
+    # 兜底：搜索工程目录下所有 system_wrapper.v
+    set found [glob -nocomplain "$project_dir/$project_name/*.gen/sources_1/bd/system/hdl/system_wrapper.v"]
+    if {$found ne ""} {
+        add_files -norecurse [lindex $found 0]
+        set_property top system_wrapper [current_fileset]
+        update_compile_order -fileset sources_1
+        puts "INFO: Wrapper added: [lindex $found 0]"
+    } else {
+        puts "WARNING: system_wrapper.v not found. Please add manually via Add Sources."
+    }
+}
 set_property top system_wrapper [current_fileset]
 
 puts ""
@@ -439,14 +456,14 @@ puts "============================================"
 puts " Block Design 创建完成!"
 puts ""
 puts " 数据链路:"
-puts "   AN9238 (65MHz) → an9238_axis → CIC_0 (5x) → CIC_1 (5x) → CLK_CONV → DMA → DDR"
+puts "   AN9238 (64MHz) → an9238_axis → CIC_0 (5x) → CIC_1 (5x) → CLK_CONV → DMA → DDR"
 puts "   GPIO → dac_out (DDS/TRI/SEL) → AN9767 (125MHz)"
 puts ""
 puts " 所有模块已完整连线，包括："
 puts "   - an9238_axis (ADC 驱动，RTL module)"
 puts "   - dac_out (DAC 输出，RTL module)"
-puts "   - 65MHz 域独立复位 (rst_ps7_65M)"
+puts "   - 64MHz 域独立复位 (rst_ps7_64M)"
 puts "   - CIC 级联 25x 抽取"
-puts "   - AXIS 时钟域转换 (65MHz → 50MHz)"
+puts "   - AXIS 时钟域转换 (64MHz → 50MHz)"
 puts "   - AXI4→AXI3 SmartConnect (DMA → HP0)"
 puts "============================================"

@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module triangle #(
     parameter WIDTH = 32,
     parameter CNT_MAX = 32'hffffffff

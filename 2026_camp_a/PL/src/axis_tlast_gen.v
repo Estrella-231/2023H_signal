@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////
 module axis_tlast_gen #(
     parameter DATA_WIDTH = 32,
-    parameter PKT_LEN    = 16384
+    parameter PKT_LEN    = 1024
 )(
     (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 aclk CLK" *)
     (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF S_AXIS:M_AXIS, ASSOCIATED_RESET aresetn, FREQ_HZ 50000000" *)

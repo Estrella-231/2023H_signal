@@ -12,7 +12,6 @@
 #include "amp_freq.h"
 #include "sleep.h"
 #include "tjc_screen.h"
-#include "amplifier.h"
 
 extern Adc_control adc_inst;
 extern ab_wave ab_inst;

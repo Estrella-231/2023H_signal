@@ -40,7 +40,7 @@
 #define ADC_WIDTH                   12
 #define ADC_REVOLUTION              4096      // 2^12
 #define ADC_REF                     1.0       // AD9238 参考电压 ±1V (参考 volt_cal.v: 5V/2048)
-#define ADC_CLK                     65000000  // 65 MSPS
+#define ADC_CLK                     64000000  // 64 MHz (PS7 FCLK_CLK1 实际输出)
 #define ADC_SNR                     70        // AD9238 典型 SNR
 
 // ============================================================
@@ -54,13 +54,13 @@
 
 #define SOFT_SAMPLE_RATE            1
 
-// AN9238: 抽取后有效采样率 = 65MHz/25 = 2.6MHz, 大 FFT 提高分辨率
+// AN9238: 抽取后有效采样率 = 64MHz/25 = 2.56MHz, 大 FFT 提高分辨率
 #define FFT_SAMPLE_LEN              (8192*2)
 
 #define SAMPLE_LEN                  (adc_inst.adc_buf_len)
 #define JUDGE_FFT_LEN               (4096*2)
 // 频率分辨率 = ADC_CLK / CIC_SAMPLE_RATE / FFT_SAMPLE_LEN
-//   AN9238: 65e6 / 25 / 16384 = 158.7 Hz/bin
+//   AN9238: 64e6 / 25 / 16384 = 156.25 Hz/bin
 
 #define TYPE_JUDGE_THRESHOLD        1e-1
 

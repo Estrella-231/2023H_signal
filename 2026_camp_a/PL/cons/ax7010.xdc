@@ -8,7 +8,7 @@
 # ===========================================================================
 # 时钟约束
 # ===========================================================================
-# ADC 时钟 65MHz (PLL 生成输出到 AN9238)
+# ADC 时钟 64MHz (PLL 生成输出到 AN9238)
 # create_clock -period 15.385 -name adc_clk [get_ports ad1_clk]
 
 # ===========================================================================
@@ -48,7 +48,7 @@ set_property PACKAGE_PIN V13 [get_ports {ad2_in[11]}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {ad2_in[*]}]
 
-# --- ADC 采样时钟输出 (65MHz, FPGA→AN9238) ---
+# --- ADC 采样时钟输出 (64MHz, FPGA→AN9238) ---
 set_property PACKAGE_PIN V12 [get_ports ad1_clk]
 set_property PACKAGE_PIN T12 [get_ports ad2_clk]
 
@@ -62,20 +62,20 @@ set_property SLEW FAST [get_ports ad2_clk]
 # ===========================================================================
 
 # --- DAC 通道 A (DA1) 14-bit 数据 ---
-set_property PACKAGE_PIN F16 [get_ports {da1_data[0]}]
-set_property PACKAGE_PIN F17 [get_ports {da1_data[1]}]
-set_property PACKAGE_PIN F19 [get_ports {da1_data[2]}]
-set_property PACKAGE_PIN F20 [get_ports {da1_data[3]}]
-set_property PACKAGE_PIN G19 [get_ports {da1_data[4]}]
-set_property PACKAGE_PIN G20 [get_ports {da1_data[5]}]
+set_property PACKAGE_PIN K17 [get_ports {da1_data[0]}]
+set_property PACKAGE_PIN K18 [get_ports {da1_data[1]}]
+set_property PACKAGE_PIN M19 [get_ports {da1_data[2]}]
+set_property PACKAGE_PIN M20 [get_ports {da1_data[3]}]
+set_property PACKAGE_PIN L19 [get_ports {da1_data[4]}]
+set_property PACKAGE_PIN L20 [get_ports {da1_data[5]}]
 set_property PACKAGE_PIN J18 [get_ports {da1_data[6]}]
 set_property PACKAGE_PIN H18 [get_ports {da1_data[7]}]
-set_property PACKAGE_PIN L19 [get_ports {da1_data[8]}]
-set_property PACKAGE_PIN L20 [get_ports {da1_data[9]}]
-set_property PACKAGE_PIN M19 [get_ports {da1_data[10]}]
-set_property PACKAGE_PIN M20 [get_ports {da1_data[11]}]
-set_property PACKAGE_PIN K17 [get_ports {da1_data[12]}]
-set_property PACKAGE_PIN K18 [get_ports {da1_data[13]}]
+set_property PACKAGE_PIN G19 [get_ports {da1_data[8]}]
+set_property PACKAGE_PIN G20 [get_ports {da1_data[9]}]
+set_property PACKAGE_PIN F19 [get_ports {da1_data[10]}]
+set_property PACKAGE_PIN F20 [get_ports {da1_data[11]}]
+set_property PACKAGE_PIN F16 [get_ports {da1_data[12]}]
+set_property PACKAGE_PIN F17 [get_ports {da1_data[13]}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {da1_data[*]}]
 
@@ -87,26 +87,26 @@ set_property IOSTANDARD LVCMOS33 [get_ports da1_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports da1_wrt]
 
 # --- DAC 通道 B (DA2) 14-bit 数据 ---
-set_property PACKAGE_PIN J20 [get_ports {da2_data[0]}]
-set_property PACKAGE_PIN H20 [get_ports {da2_data[1]}]
-set_property PACKAGE_PIN L16 [get_ports {da2_data[2]}]
-set_property PACKAGE_PIN L17 [get_ports {da2_data[3]}]
-set_property PACKAGE_PIN M17 [get_ports {da2_data[4]}]
-set_property PACKAGE_PIN M18 [get_ports {da2_data[5]}]
-set_property PACKAGE_PIN D19 [get_ports {da2_data[6]}]
-set_property PACKAGE_PIN D20 [get_ports {da2_data[7]}]
-set_property PACKAGE_PIN E18 [get_ports {da2_data[8]}]
-set_property PACKAGE_PIN E19 [get_ports {da2_data[9]}]
-set_property PACKAGE_PIN G17 [get_ports {da2_data[10]}]
-set_property PACKAGE_PIN G18 [get_ports {da2_data[11]}]
-set_property PACKAGE_PIN H16 [get_ports {da2_data[12]}]
-set_property PACKAGE_PIN H17 [get_ports {da2_data[13]}]
+set_property PACKAGE_PIN H15 [get_ports {da2_data[0]}]
+set_property PACKAGE_PIN G15 [get_ports {da2_data[1]}]
+set_property PACKAGE_PIN H16 [get_ports {da2_data[2]}]
+set_property PACKAGE_PIN H17 [get_ports {da2_data[3]}]
+set_property PACKAGE_PIN G17 [get_ports {da2_data[4]}]
+set_property PACKAGE_PIN G18 [get_ports {da2_data[5]}]
+set_property PACKAGE_PIN E18 [get_ports {da2_data[6]}]
+set_property PACKAGE_PIN E19 [get_ports {da2_data[7]}]
+set_property PACKAGE_PIN D19 [get_ports {da2_data[8]}]
+set_property PACKAGE_PIN D20 [get_ports {da2_data[9]}]
+set_property PACKAGE_PIN M17 [get_ports {da2_data[10]}]
+set_property PACKAGE_PIN M18 [get_ports {da2_data[11]}]
+set_property PACKAGE_PIN L16 [get_ports {da2_data[12]}]
+set_property PACKAGE_PIN L17 [get_ports {da2_data[13]}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {da2_data[*]}]
 
 # --- DAC 通道 B 时钟和写使能 ---
-set_property PACKAGE_PIN H15 [get_ports da2_clk]
-set_property PACKAGE_PIN G15 [get_ports da2_wrt]
+set_property PACKAGE_PIN H20 [get_ports da2_clk]
+set_property PACKAGE_PIN J20 [get_ports da2_wrt]
 
 set_property IOSTANDARD LVCMOS33 [get_ports da2_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports da2_wrt]
@@ -145,3 +145,9 @@ set_property SLEW FAST [get_ports da2_wrt]
 # ADC 时钟输出：FAST
 set_property SLEW FAST [get_ports ad1_clk]
 set_property SLEW FAST [get_ports ad2_clk]
+
+# AXI GPIO configuration crosses from the 50 MHz PS clock domain into the
+# 125 MHz DAC waveform domain through config_bus_cdc in dac_out.v.
+set_clock_groups -name cfg_to_dac_cdc_async -asynchronous \
+    -group [get_clocks clk_fpga_0] \
+    -group [get_clocks clk_out1_system_clk_wiz_0_0]
